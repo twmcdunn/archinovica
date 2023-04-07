@@ -1,7 +1,7 @@
 # archinovica
 A digital augmented instrument (DAI) for extended just intonation
 
-This read me file focuses on using the instrument in performance; more informattion to come for developers.
+This read me file focuses on using the instrument in performance; more information to come for developers.
 
 To use the instrument:
 1. Download 'Archinovica.jar'
