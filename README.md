@@ -11,6 +11,11 @@ To use the instrument:
 
 If nothing happens, the program has been blocked by your security settings. On mac, go to System Preferences > Security & Privacy and click "open anyway"
 
+When playing the archinovica, the most resonant and pure tuning of all intervals is used by default. To use alternative tunings, hold the right or left foot pedal or both on your keyboard during the attack of a chord; this will cause the algorithm to jump across 5-limit space, rather than moving to the closest possible tuning.
+
+To reset the tuning of the instrument, press 'R'. For full-screen mode, press 'Z'.
+
+---------Harmonic Design----------
 
 If you have a specific harmonic plan you would like your piece to follow in 5-limit space, consider using the program "Harmonic Design.jar" also included in this repository.  Simply download and double click the .jar file to get started.
 
