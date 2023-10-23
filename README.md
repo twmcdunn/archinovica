@@ -15,7 +15,7 @@ When playing the archinovica, the most resonant and pure tuning of all intervals
 
 To reset the tuning of the instrument, press 'R'. For full-screen mode, press 'Z'.
 
-For examples of pieces I (TWM) have written for archinovica go here: https://uofi.box.com/s/6fee06ncryz79uchkimypea66pmpatl1
+For examples of pieces I (TWM) have written for archinovica go here: https://www.timothywmcdunn.com/archinovica-works
 
 ---------Harmonic Design----------
 
