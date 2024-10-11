@@ -1,0 +1,174 @@
+NEW SET
+fifths
+3
+thirds
+-1
+NEW SET
+fifths
+0
+thirds
+1
+fifths
+2
+thirds
+1
+fifths
+1
+thirds
+0
+fifths
+1
+thirds
+1
+fifths
+0
+thirds
+0
+NEW SET
+fifths
+0
+thirds
+1
+fifths
+2
+thirds
+1
+fifths
+1
+thirds
+0
+fifths
+1
+thirds
+1
+fifths
+0
+thirds
+0
+NEW SET
+fifths
+9
+thirds
+-15
+NEW SET
+fifths
+21
+thirds
+0
+NEW SET
+fifths
+29
+thirds
+-23
+NEW SET
+fifths
+34
+thirds
+0
+NEW SET
+fifths
+45
+thirds
+-24
+NEW SET
+fifths
+40
+thirds
+-2
+fifths
+42
+thirds
+-2
+fifths
+41
+thirds
+-3
+fifths
+41
+thirds
+-2
+fifths
+40
+thirds
+-3
+NEW SET
+fifths
+53
+thirds
+-25
+NEW SET
+fifths
+57
+thirds
+-18
+fifths
+59
+thirds
+-18
+fifths
+58
+thirds
+-19
+fifths
+58
+thirds
+-18
+fifths
+57
+thirds
+-19
+NEW SET
+fifths
+61
+thirds
+-25
+fifths
+63
+thirds
+-25
+fifths
+61
+thirds
+-24
+fifths
+63
+thirds
+-24
+fifths
+62
+thirds
+-25
+fifths
+62
+thirds
+-24
+NEW SET
+fifths
+38
+thirds
+-14
+NEW SET
+fifths
+38
+thirds
+-3
+NEW SET
+fifths
+42
+thirds
+-8
+NEW SET
+fifths
+40
+thirds
+-20
+NEW SET
+fifths
+20
+thirds
+-5
+NEW SET
+fifths
+5
+thirds
+-2
