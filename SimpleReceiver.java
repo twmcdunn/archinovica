@@ -68,8 +68,8 @@ public class SimpleReceiver implements Receiver
         //JOptionPane.showMessageDialog(null,"rec = " + rec);
         GUI.simpRec = this;
     }
-    
-      public void setupDataFlow(){
+
+    public void setupDataFlow(){
 
         try{
             Transmitter trans = null;
@@ -79,16 +79,27 @@ public class SimpleReceiver implements Receiver
                 MidiDevice.Info transInfo = (MidiDevice.Info)JOptionPane.showInputDialog(null, 
                         "Please select a source. From which device should\nthe archinovica RECEIVE messages?", "MIDI IN", 
                         JOptionPane.QUESTION_MESSAGE, null, MidiSystem.getMidiDeviceInfo(), MidiSystem.getMidiDeviceInfo()[0]);
+                MidiDevice device = MidiSystem.getMidiDevice(transInfo);
+                if(!device.isOpen()){
+                    device.open();
+                }
+
                 List<Transmitter> ts = MidiSystem.getMidiDevice(transInfo).getTransmitters();
                 if(ts.size() == 1){
                     trans = ts.get(0);
                     transmitterFound = true;
                 }
                 else if(ts.size() == 0){
-                    int selection = JOptionPane.showConfirmDialog(null,"The device you've selected doesn't send midi messages.\nPlease select a different device", "Invalid Selection", JOptionPane.OK_CANCEL_OPTION);
-                    transmitterFound = false;
-                    if(selection == JOptionPane.CANCEL_OPTION)
-                        return;
+                    try{
+                        trans = device.getTransmitter();
+                        transmitterFound = true;
+                    }
+                    catch(MidiUnavailableException e){
+                        int selection = JOptionPane.showConfirmDialog(null,"The device you've selected doesn't send midi messages.\nPlease select a different device", "Invalid Selection", JOptionPane.OK_CANCEL_OPTION);
+                        transmitterFound = false;
+                        if(selection == JOptionPane.CANCEL_OPTION)
+                            return;
+                    }
                 }
                 else{
 
@@ -120,6 +131,8 @@ public class SimpleReceiver implements Receiver
                 }
             }
             while(!transmitterFound);
+            
+            trans.setReceiver(this);
 
             boolean recFound = true;
 
@@ -133,8 +146,12 @@ public class SimpleReceiver implements Receiver
                         JOptionPane.QUESTION_MESSAGE, null, recOptions, recOptions[0]);
 
                 List<Receiver> rs = new ArrayList<Receiver>();
+                MidiDevice dev = null;
                 if(recInfo instanceof MidiDevice.Info){
-                    MidiDevice dev = MidiSystem.getMidiDevice((MidiDevice.Info)recInfo);
+                    dev = MidiSystem.getMidiDevice((MidiDevice.Info)recInfo);
+                    if(!dev.isOpen()){
+                        dev.open();
+                    }
                     rs = dev.getReceivers();
                 }
                 else
@@ -147,10 +164,16 @@ public class SimpleReceiver implements Receiver
                     recFound = true;
                 }
                 else if(rs.size() == 0){
-                    int selection = JOptionPane.showConfirmDialog(null,"The device you've selected doesn't receive midi messages.\nPlease select a different device", "Invalid Selection", JOptionPane.OK_CANCEL_OPTION);
-                    recFound = false;
-                    if(selection == JOptionPane.CANCEL_OPTION)
-                        return;
+                    try{
+                        rec = dev.getReceiver();
+                        recFound = true;
+                    }
+                    catch(MidiUnavailableException e){
+                        int selection = JOptionPane.showConfirmDialog(null,"The device you've selected doesn't receive midi messages.\nPlease select a different device", "Invalid Selection", JOptionPane.OK_CANCEL_OPTION);
+                        recFound = false;
+                        if(selection == JOptionPane.CANCEL_OPTION)
+                            return;
+                    }
                 }
                 else{
 
