@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.Collections;
 import javax.swing.JOptionPane;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.HashMap;
 
 /**
  * Write a description of class SimpleReceiver here.
@@ -28,8 +29,10 @@ public class SimpleReceiver implements Receiver
     public long delay;
     public static final int MIDPED = 66, LEFTPED = 67, RIGHTPED = 64;
     public boolean rightPedal, leftPedal, middlePedal;
-    public boolean useDelay = true, sustain = true;
+    public boolean useDelay = true, sustain = false;
     public int[] chanTrans;
+    public Transmitter trans;
+    public HashMap<Integer,Integer> noteTransMap;
     /*
      * In theory, it may be possible to avoid any delay window,
      * by sending the note on message immediately, followed by
@@ -45,16 +48,18 @@ public class SimpleReceiver implements Receiver
     {
         try{
             rec = MidiSystem.getReceiver();
-            Transmitter trans = MidiSystem.getTransmitter();
+            trans = MidiSystem.getTransmitter();
             trans.setReceiver(this);
         }catch(MidiUnavailableException e){
             JOptionPane.showMessageDialog(null,
                 "No MIDI device found. Don't panic! If you're trying to perform\nlive on the Archinoivca, please connect a MIDI keyboard to the \ncomputer, and then restart the software.");
         }
+        ped();
 
         transposition = 0; // transpose by 0 EQ'd semitones to begin
         bendAdjustment = 0;
         chanTrans = new int[16];
+        noteTransMap = new HashMap<Integer,Integer>();
 
         delay = 30L;
         rightPedal = false;
@@ -72,7 +77,7 @@ public class SimpleReceiver implements Receiver
     public void setupDataFlow(){
 
         try{
-            Transmitter trans = null;
+            Transmitter localTrans = null;
             boolean transmitterFound = false;
 
             do{
@@ -86,12 +91,12 @@ public class SimpleReceiver implements Receiver
 
                 List<Transmitter> ts = MidiSystem.getMidiDevice(transInfo).getTransmitters();
                 if(ts.size() == 1){
-                    trans = ts.get(0);
+                    localTrans = ts.get(0);
                     transmitterFound = true;
                 }
                 else if(ts.size() == 0){
                     try{
-                        trans = device.getTransmitter();
+                        localTrans = device.getTransmitter();
                         transmitterFound = true;
                     }
                     catch(MidiUnavailableException e){
@@ -126,12 +131,14 @@ public class SimpleReceiver implements Receiver
                     Integer transPort = (Integer)JOptionPane.showInputDialog(null, 
                             transInfo + " can send Midi data from multiple ports. Please select one to use." + aStr, "MIDI IN", 
                             JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-                    trans = ts.get(transPort - 1);
+                    localTrans = ts.get(transPort - 1);
                     transmitterFound = true;
                 }
             }
             while(!transmitterFound);
-            
+
+            trans.setReceiver(null);
+            trans = localTrans;
             trans.setReceiver(this);
 
             boolean recFound = true;
@@ -201,6 +208,7 @@ public class SimpleReceiver implements Receiver
                     recFound = true;
                 }   
             }while(!recFound);
+            ped();
 
         }catch(MidiUnavailableException e){
             JOptionPane.showMessageDialog(null,
@@ -208,7 +216,29 @@ public class SimpleReceiver implements Receiver
         }
     }
 
+    public void ped(){
+
+        try{
+            for(int chnl = 0; chnl < 14; chnl++)
+                rec.send(new ShortMessage(ShortMessage.CONTROL_CHANGE, chnl, RIGHTPED, 64),0);
+        }
+        catch(Exception e){};	
+
+        /*
+        for(int chnl = 0; chnl < 14; chnl++){
+        try{
+        rec.send( new ShortMessage(ShortMessage.CONTROL_CHANGE, chnl, 120, 64), 0);
+        }
+        catch(InvalidMidiDataException e){
+        JOptionPane.showMessageDialog(null,
+        "Something went wrong!  I'm not sure what :-/\nMaybe you can figure it out?");
+        }
+        }
+         */
+    }
+
     public void send(MidiMessage message, long timeStamp){
+
         if(message instanceof ShortMessage){
             ShortMessage sm = (ShortMessage)message;
 
@@ -242,7 +272,9 @@ public class SimpleReceiver implements Receiver
                 int type = ShortMessage.NOTE_ON;
                 try{
                     ShortMessage aSM = new ShortMessage(ShortMessage.NOTE_ON, channel, sm.getData1() + 2 * transposition, sm.getData2());
+
                     modifyCommands(false, aSM);
+                    noteTransMap.put(new Integer(sm.getData1()), new Integer(sm.getData1() + 2 * transposition));
                     chanTrans[channel] = transposition;
                 }catch(InvalidMidiDataException e){
                     JOptionPane.showMessageDialog(null,
@@ -264,7 +296,9 @@ public class SimpleReceiver implements Receiver
                 if(channel == 9)
                     channel = 13;
                 try{
-                    ShortMessage aSM = new ShortMessage(ShortMessage.NOTE_OFF, channel, sm.getData1() + 2 * chanTrans[channel], sm.getData2());
+                    ShortMessage aSM = new ShortMessage(ShortMessage.NOTE_OFF, channel, noteTransMap.get(sm.getData1()), sm.getData2());
+                    //System.out.println("NOTE OFF: " + noteTransMap.get(sm.getData1()) + " on CHANEL: " + channel);
+                    noteTransMap.remove(sm.getData1());
                     rec.send(aSM, 0L);
                 }catch(InvalidMidiDataException e){
                     JOptionPane.showMessageDialog(null,
@@ -306,8 +340,17 @@ public class SimpleReceiver implements Receiver
                     middlePedal = sm.getData2() > 0;
                     if(middlePedal){
                         for(int chnl = 0; chnl < 14; chnl++){
+                            /*
                             try{
-                                rec.send( new ShortMessage(ShortMessage.CONTROL_CHANGE, chnl, 120, 0), 0);
+                            rec.send( new ShortMessage(ShortMessage.CONTROL_CHANGE, chnl, 120, 0), 0);
+                            }
+                            catch(InvalidMidiDataException e){
+                            JOptionPane.showMessageDialog(null,
+                            "Something went wrong!  I'm not sure what :-/\nMaybe you can figure it out?");
+                            }
+                             */
+                            try{
+                                rec.send( new ShortMessage(ShortMessage.CONTROL_CHANGE, chnl, RIGHTPED, 0), 0);
                             }
                             catch(InvalidMidiDataException e){
                                 JOptionPane.showMessageDialog(null,
@@ -333,6 +376,17 @@ public class SimpleReceiver implements Receiver
                         }
                         }
                          */
+                    }
+                    else{
+                        for(int chnl = 0; chnl < 14; chnl++){
+                            try{
+                                rec.send( new ShortMessage(ShortMessage.CONTROL_CHANGE, chnl, RIGHTPED, 64), 0);
+                            }
+                            catch(InvalidMidiDataException e){
+                                JOptionPane.showMessageDialog(null,
+                                    "Something went wrong!  I'm not sure what :-/\nMaybe you can figure it out?");
+                            }
+                        }
                     }
                     break;
                 }
@@ -361,6 +415,7 @@ public class SimpleReceiver implements Receiver
 
             playable = updateIntonation(ps, playable);
             for(ShortMessage sm: playable){
+                //System.out.println("NOTE ON: " + sm.getData1() + " on CHANEL: " + sm.getChannel());
                 rec.send(sm, 0L);
             }
             return;
@@ -405,6 +460,7 @@ public class SimpleReceiver implements Receiver
                             int thisKey = sm.getData1();
                             int thisKeyTransIndex = sm.getData1() - originalTransposition;
                             //keyTransposition[sm.getData1() - originalTransposition] = transposition;
+                            noteTransMap.put(new Integer(sm.getData1() - originalTransposition * 2), new Integer(sm.getData1() + 2 * deltaTransposition));
                             sm.setMessage(sm.getCommand(), sm.getChannel(),
                                 sm.getData1() + 2 * deltaTransposition, sm.getData2());
                         }
