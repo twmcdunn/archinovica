@@ -1005,6 +1005,7 @@ public class GUI extends JPanel implements KeyListener, ActionListener, MouseLis
             Track[] tracks = seq.getTracks();
             for(int n = tracks.length - 1; n < tracks.length; n++){
                 Track t = tracks[n];
+                System.out.println("track size: " + t.size());
                 for(int i = 0; i < t.size(); i++)
                     if(t.get(i).getMessage() instanceof ShortMessage){
                         ShortMessage sm = (ShortMessage)t.get(i).getMessage();
@@ -1014,6 +1015,7 @@ public class GUI extends JPanel implements KeyListener, ActionListener, MouseLis
                             && (sm.getData1() == LiveReceiver.RIGHTPED
                                 || sm.getData1() == LiveReceiver.LEFTPED))){
                             addEvent(t.get(i));
+                            System.out.println("  Shortmessage");
                             if(sm.getCommand() == ShortMessage.NOTE_ON)
                                 System.out.println("NOTE ON: " + sm.getData1());
                         }
@@ -1522,7 +1524,7 @@ public class GUI extends JPanel implements KeyListener, ActionListener, MouseLis
         public ArrayList<Letter> signs;
         public PitchSet myPitchSet;
 
-        Chord(MidiEvent me){
+        public Chord(MidiEvent me){
             lChange = 0;
             rChange = 0;
             set = new boolean[12];
